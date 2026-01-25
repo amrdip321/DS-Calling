@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>D+S Calling - Modern Communication</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
+    <style>
+        /* CSS will be added in the next section */
+        :root {
+            --primary: #00A878;
+            --primary-dark: #008f67;
+            --background: #121212;
+            --container-bg: #1e1e1e;
+            --surface: #2d2d2d;
+            --surface-light: #3a3a3a;
+            --text-primary: #e0e0e0;
+            --text-secondary: #a0a0a0;
+            --text-disabled: #666666;
+            --self-bubble: #008f67;
+            --other-bubble: #2d2d2d;
+            --error: #cf6679;
+            --warning: #ffb74d;
+            --success: #81c784;
+            --border: #333333;
+            --shadow: rgba(0, 0, 0, 0.3);
+            --call-accept: #4caf50;
+            --call-reject: #f44336;
+            --overlay: rgba(0, 0, 0, 0.85);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: var(--background);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .phone-container {
+            width: 100%;
+            max-width: 400px;
+            height: 800px;
+            max-height: 90vh;
+            background: var(--container-bg);
+            border-radius: 40px;
+            overflow: hidden;
+            position: relative;
+            box-shadow: 0 20px 60px var(--shadow);
+            border: 12px solid #000;
+        }
+
+        .status-bar {
+            height: 50px;
+            background: #000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+            color: white;
+            font-size: 14px;
+        }
+
+        .app-container {
+            height: calc(100% - 100px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .loading-screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--container-bg);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid var(--border);
+            border-top: 4px solid var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .hidden {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+    <!-- Phone Container -->
+    <div class="phone-container">
+        <!-- Status Bar -->
+        <div class="status-bar">
+            <span id="currentTime">12:00</span>
+            <div class="status-icons">
+                <i class="fas fa-signal"></i>
+                <i class="fas fa-wifi"></i>
+                <i class="fas fa-battery-three-quarters"></i>
+            </div>
+        </div>
+
+        <!-- Main App Container -->
+        <div class="app-container">
+            <!-- Loading Screen -->
+            <div class="loading-screen" id="loadingScreen">
+                <div class="spinner"></div>
+            </div>
+
+            <!-- Auth Screen -->
+            <div class="screen" id="authScreen">
+                <!-- Will be populated by JavaScript -->
+            </div>
+
+            <!-- Main App Screen -->
+            <div class="screen hidden" id="appScreen">
+                <!-- Will be populated by JavaScript -->
+            </div>
+        </div>
+
+        <!-- Bottom Navigation -->
+        <div class="bottom-nav hidden" id="bottomNav">
+            <!-- Will be populated by JavaScript -->
+        </div>
+    </div>
+
+    <!-- All Modals -->
+    <div id="modalsContainer">
+        <!-- Will be populated by JavaScript -->
+    </div>
+
+    <!-- JavaScript Module -->
+    <script type="module">
+        // JavaScript will be added in subsequent sections
+        console.log('D+S Calling Application Starting...');
+        
+        // Temporary loading indicator
+        document.getElementById('loadingScreen').classList.remove('hidden');
+    </script>
+</body>
+</html>
