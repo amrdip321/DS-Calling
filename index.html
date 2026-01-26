@@ -2,191 +2,263 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>D+S Calling</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
+<title>DS Calling</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
-
 <style>
-:root {
-  --primary:#00A878;
-  --bg:#121212;
-  --card:#1e1e1e;
-  --text:#e0e0e0;
-  --border:#333;
-}
-
-* { box-sizing:border-box; }
-
-body {
-  margin:0;
-  font-family: Arial, sans-serif;
-  background:#000;
-  color:var(--text);
-}
-
-/* Screens */
-.screen {
-  display:none;
-  height:100vh;
-  width:100%;
-}
-
-.screen.active {
-  display:flex;
-  flex-direction:column;
-}
-
-/* Auth */
-#auth-screen {
-  justify-content:center;
-  padding:30px;
-}
-
-input, button {
-  width:100%;
-  padding:12px;
-  margin:10px 0;
-  border-radius:8px;
-  border:none;
-}
-
-input {
-  background:var(--card);
-  color:#fff;
-  border:1px solid var(--border);
-}
-
-button {
-  background:var(--primary);
-  color:#fff;
-  font-size:16px;
-  cursor:pointer;
-}
-
-/* Header */
-header {
-  height:60px;
-  background:var(--card);
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  padding:0 15px;
-  border-bottom:1px solid var(--border);
-}
-
-main {
-  flex:1;
-  padding:20px;
-}
-
-.card {
-  background:var(--card);
-  border:1px solid var(--border);
-  padding:15px;
-  border-radius:10px;
-  margin-bottom:10px;
-}
+*{box-sizing:border-box;margin:0;padding:0;font-family:'Segoe UI',sans-serif;}
+body{background:#121212;color:#fff;height:100vh;width:100vw;display:flex;align-items:center;justify-content:center;overflow:hidden;}
+button{cursor:pointer;border:none;border-radius:6px;padding:10px 15px;font-weight:bold;}
+input{padding:10px 12px;border-radius:6px;border:none;margin-bottom:10px;width:100%;}
+#app{width:100%;max-width:420px;height:90vh;background:#1e1e1e;border-radius:15px;overflow:hidden;display:flex;flex-direction:column;}
+.screen{display:none;flex-direction:column;height:100%;width:100%;padding:20px;}
+.screen.active{display:flex;}
+.screen input{background:#2a2a2a;color:#fff;}
+.screen button{background:#0fbcf9;color:#fff;}
+#chatScreen{flex:1;display:flex;flex-direction:column;}
+#contacts{height:80px;background:#1a1a1a;display:flex;align-items:center;overflow-x:auto;padding:0 10px;}
+.contact{margin-right:10px;text-align:center;cursor:pointer;}
+.contact img{width:50px;height:50px;border-radius:50%;border:2px solid #0fbcf9;}
+.contact p{font-size:12px;margin-top:5px;}
+#messages{flex:1;padding:10px;overflow-y:auto;}
+.message{margin-bottom:10px;max-width:70%;padding:8px 12px;border-radius:15px;word-wrap:break-word;}
+.message.me{background:#0fbcf9;align-self:flex-end;color:#fff;}
+.message.other{background:#2a2a2a;align-self:flex-start;color:#fff;}
+#messageInput{display:flex;padding:10px;background:#1a1a1a;}
+#messageInput input{flex:1;margin-right:10px;background:#2a2a2a;color:#fff;}
+#callScreen{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;}
+#callScreen video{width:100%;border-radius:10px;margin-bottom:10px;}
+#profileScreen input{background:#2a2a2a;color:#fff;}
+#otpScreen input{width:100%;text-align:center;letter-spacing:5px;}
+#groups{height:80px;background:#1a1a1a;display:flex;align-items:center;overflow-x:auto;padding:0 10px;}
+.group{margin-right:10px;text-align:center;cursor:pointer;}
+.group img{width:50px;height:50px;border-radius:50%;border:2px solid #fbc02d;}
+.group p{font-size:12px;margin-top:5px;}
 </style>
 </head>
-
 <body>
+<div id="app">
+  <!-- Login -->
+  <div class="screen active" id="loginScreen">
+    <h2>DS Calling Login</h2>
+    <input type="email" id="email" placeholder="Enter email"/>
+    <input type="password" id="password" placeholder="Enter password"/>
+    <button id="loginBtn">Login / Sign Up</button>
+  </div>
 
-<!-- AUTH SCREEN -->
-<div id="auth-screen" class="screen active">
-  <h2 style="text-align:center;color:var(--primary)">D+S Calling</h2>
-  <p style="text-align:center;color:#aaa">Login with Email</p>
+  <!-- OTP Verification -->
+  <div class="screen" id="otpScreen">
+    <h2>Enter OTP</h2>
+    <input type="text" id="otpInput" maxlength="6" placeholder="123456"/>
+    <button id="verifyOtpBtn">Verify OTP</button>
+  </div>
 
-  <input type="email" id="email-input" placeholder="Enter email" />
-  <button onclick="app.login()">Continue</button>
+  <!-- Profile Setup -->
+  <div class="screen" id="profileScreen">
+    <h2>Setup Profile</h2>
+    <input type="text" id="name" placeholder="Enter name"/>
+    <input type="text" id="pp" placeholder="Profile pic URL"/>
+    <button id="saveProfileBtn">Save Profile</button>
+  </div>
 
-  <p style="text-align:center;font-size:12px;color:#666">
-    Protected by Firebase Authentication
-  </p>
+  <!-- Chat Screen -->
+  <div class="screen" id="chatScreen">
+    <div id="groups"></div>
+    <div id="contacts"></div>
+    <div id="messages"></div>
+    <div id="messageInput">
+      <input type="text" id="msgText" placeholder="Type message"/>
+      <button id="sendMsgBtn"><i class="fa fa-paper-plane"></i></button>
+    </div>
+  </div>
+
+  <!-- Call Screen -->
+  <div class="screen" id="callScreen">
+    <video id="localVideo" autoplay muted></video>
+    <video id="remoteVideo" autoplay></video>
+    <button id="endCallBtn" style="background:red;">End Call</button>
+  </div>
 </div>
 
-<!-- MAIN APP -->
-<div id="main-screen" class="screen">
-  <header>
-    <h3>D+S Calling</h3>
-    <i class="fas fa-sign-out-alt" onclick="app.logout()" style="cursor:pointer"></i>
-  </header>
-
-  <main>
-    <div class="card">
-      <h4>Chats</h4>
-      <p style="color:#aaa">Chat UI will load here</p>
-    </div>
-
-    <div class="card">
-      <h4>Calls</h4>
-      <p style="color:#aaa">Audio / Video calling UI</p>
-    </div>
-
-    <div class="card">
-      <h4>Status</h4>
-      <p id="user-email"></p>
-    </div>
-  </main>
-</div>
-
-<!-- FIREBASE + SAM LOGIC -->
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-import {
-  getAuth,
-  createUserWithEmailAndPassword,
-  signInWithEmailAndPassword,
-  onAuthStateChanged,
-  signOut
-} from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+<script>
+// ===== Firebase Config =====
 const firebaseConfig = {
-  apiKey: "AIzaSyBe7_n68yQgatGDrxxH6De6dGS1px4G_04",
-  authDomain: "ds-calling.firebaseapp.com",
-  projectId: "ds-calling",
-  storageBucket: "ds-calling.firebasestorage.app",
-  messagingSenderId: "1083574697798",
-  appId: "1:1083574697798:web:8f087f4bea903a0add2f47"
+  apiKey: "YOUR_API_KEY",
+  authDomain: "YOUR_PROJECT.firebaseapp.com",
+  databaseURL: "https://YOUR_PROJECT-default-rtdb.firebaseio.com",
+  projectId: "YOUR_PROJECT",
+  storageBucket: "YOUR_PROJECT.appspot.com",
+  messagingSenderId: "XXXX",
+  appId: "XXXX"
 };
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.database();
 
-const fbApp = initializeApp(firebaseConfig);
-const auth = getAuth(fbApp);
+// ===== Elements =====
+const loginScreen = document.getElementById('loginScreen');
+const otpScreen = document.getElementById('otpScreen');
+const profileScreen = document.getElementById('profileScreen');
+const chatScreen = document.getElementById('chatScreen');
+const callScreen = document.getElementById('callScreen');
 
-window.app = {
-  async login() {
-    const email = document.getElementById("email-input").value.trim();
-    if (!email) return alert("Email required");
+const emailInput = document.getElementById('email');
+const passwordInput = document.getElementById('password');
+const loginBtn = document.getElementById('loginBtn');
 
-    const password = "Temp@12345";
+const otpInput = document.getElementById('otpInput');
+const verifyOtpBtn = document.getElementById('verifyOtpBtn');
 
-    try {
-      await signInWithEmailAndPassword(auth, email, password);
-    } catch (e) {
-      if (e.code === "auth/user-not-found") {
-        await createUserWithEmailAndPassword(auth, email, password);
-      } else {
-        alert(e.message);
+const nameInput = document.getElementById('name');
+const ppInput = document.getElementById('pp');
+const saveProfileBtn = document.getElementById('saveProfileBtn');
+
+const contactsDiv = document.getElementById('contacts');
+const groupsDiv = document.getElementById('groups');
+const messagesDiv = document.getElementById('messages');
+const msgText = document.getElementById('msgText');
+const sendMsgBtn = document.getElementById('sendMsgBtn');
+
+const localVideo = document.getElementById('localVideo');
+const remoteVideo = document.getElementById('remoteVideo');
+const endCallBtn = document.getElementById('endCallBtn');
+
+let currentUserUid;
+let otpCode;
+
+// ===== Login =====
+loginBtn.addEventListener('click',()=>{
+  const email = emailInput.value;
+  const password = passwordInput.value;
+  if(!email || !password){alert('Enter email and password');return;}
+  auth.signInWithEmailAndPassword(email,password)
+    .then(res=>{
+      currentUserUid=res.user.uid;
+      sendOtp();
+    })
+    .catch(err=>{
+      if(err.code==='auth/user-not-found'){
+        auth.createUserWithEmailAndPassword(email,password)
+        .then(res=>{
+          currentUserUid=res.user.uid;
+          sendOtp();
+        })
+        .catch(e=>alert(e.message));
+      } else alert(err.message);
+    });
+});
+
+// ===== OTP =====
+function sendOtp(){
+  otpCode=Math.floor(100000+Math.random()*900000);
+  alert('OTP for demo: '+otpCode); // In production, send email/SMS
+  showScreen(otpScreen);
+}
+
+verifyOtpBtn.addEventListener('click',()=>{
+  if(otpInput.value==otpCode) showProfileOrChat();
+  else alert('Wrong OTP');
+});
+
+// ===== Profile Setup =====
+saveProfileBtn.addEventListener('click',()=>{
+  const name = nameInput.value;
+  const pp = ppInput.value;
+  if(!name || !pp){alert('Enter name and profile pic URL');return;}
+  db.ref('profiles/'+currentUserUid).set({name,pp});
+  showScreen(chatScreen);
+  loadContacts();
+  loadGroups();
+});
+
+// ===== Load Contacts & Groups =====
+function loadContacts(){
+  db.ref('profiles').on('value',snap=>{
+    contactsDiv.innerHTML='';
+    snap.forEach(u=>{
+      if(u.key!==currentUserUid){
+      const c=document.createElement('div');
+      c.className='contact';
+      c.innerHTML=`<img src="${u.val().pp}"/><p>${u.val().name}</p>`;
+      contactsDiv.appendChild(c);
+      c.addEventListener('click',()=>startCall(u.key));
       }
-    }
-  },
+    });
+  });
+}
 
-  logout() {
-    signOut(auth);
-  }
-};
+function loadGroups(){
+  db.ref('groups').on('value',snap=>{
+    groupsDiv.innerHTML='';
+    snap.forEach(g=>{
+      const gr=document.createElement('div');
+      gr.className='group';
+      gr.innerHTML=`<img src="https://via.placeholder.com/50"/><p>${g.val().name}</p>`;
+      groupsDiv.appendChild(gr);
+    });
+  });
+}
 
-/* SAM = single source of truth */
-onAuthStateChanged(auth, user => {
-  document.getElementById("auth-screen").classList.toggle("active", !user);
-  document.getElementById("main-screen").classList.toggle("active", !!user);
+// ===== Chat =====
+sendMsgBtn.addEventListener('click',()=>{
+  const text = msgText.value;
+  if(!text)return;
+  const msgData = {text,uid:currentUserUid,time:Date.now()};
+  db.ref('messages').push(msgData);
+  msgText.value='';
+});
 
-  if (user) {
-    document.getElementById("user-email").innerText =
-      "Logged in as: " + user.email;
-  }
+db.ref('messages').on('child_added',snap=>{
+  const m = snap.val();
+  const div=document.createElement('div');
+  div.className='message '+(m.uid===currentUserUid?'me':'other');
+  div.innerText = m.text;
+  messagesDiv.appendChild(div);
+  messagesDiv.scrollTop = messagesDiv.scrollHeight;
+});
+
+// ===== Screen Switch =====
+function showScreen(screen){
+  [loginScreen,otpScreen,profileScreen,chatScreen,callScreen].forEach(s=>s.classList.remove('active'));
+  screen.classList.add('active');
+}
+
+function showProfileOrChat(){
+  db.ref('profiles/'+currentUserUid).get().then(snap=>{
+    if(snap.exists()) { showScreen(chatScreen); loadContacts(); loadGroups(); }
+    else showScreen(profileScreen);
+  });
+}
+
+// ===== Auto Login =====
+auth.onAuthStateChanged(user=>{
+  if(user){ currentUserUid=user.uid; showProfileOrChat();}
+});
+
+// ===== WebRTC Calls =====
+let localStream, pc;
+async function startCall(targetUid){
+  showScreen(callScreen);
+  localStream = await navigator.mediaDevices.getUserMedia({video:true,audio:true});
+  localVideo.srcObject = localStream;
+
+  pc = new RTCPeerConnection();
+  localStream.getTracks().forEach(track=>pc.addTrack(track,localStream));
+  pc.ontrack = e=>{remoteVideo.srcObject = e.streams[0];};
+
+  const offer = await pc.createOffer();
+  await pc.setLocalDescription(offer);
+  db.ref('calls/'+currentUserUid+'/'+targetUid).set({offer});
+}
+
+endCallBtn.addEventListener('click',()=>{
+  if(pc) pc.close();
+  if(localStream) localStream.getTracks().forEach(t=>t.stop());
+  showScreen(chatScreen);
 });
 </script>
-
 </body>
 </html>
