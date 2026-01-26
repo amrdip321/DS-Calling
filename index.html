@@ -1,31 +1,137 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>D+S Calling</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta charset="UTF-8">
+<title>D+S Calling</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <!-- Icons -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
 
-  <!-- Your existing CSS (UNCHANGED) -->
-  <!-- 👇 tumhara pura style yahi paste kiya gaya hai -->
-  <!-- (same as you sent, not repeated here for brevity in explanation) -->
-  <!-- KEEP YOUR STYLE TAG EXACT SAME -->
+<style>
+:root {
+  --primary:#00A878;
+  --bg:#121212;
+  --card:#1e1e1e;
+  --text:#e0e0e0;
+  --border:#333;
+}
+
+* { box-sizing:border-box; }
+
+body {
+  margin:0;
+  font-family: Arial, sans-serif;
+  background:#000;
+  color:var(--text);
+}
+
+/* Screens */
+.screen {
+  display:none;
+  height:100vh;
+  width:100%;
+}
+
+.screen.active {
+  display:flex;
+  flex-direction:column;
+}
+
+/* Auth */
+#auth-screen {
+  justify-content:center;
+  padding:30px;
+}
+
+input, button {
+  width:100%;
+  padding:12px;
+  margin:10px 0;
+  border-radius:8px;
+  border:none;
+}
+
+input {
+  background:var(--card);
+  color:#fff;
+  border:1px solid var(--border);
+}
+
+button {
+  background:var(--primary);
+  color:#fff;
+  font-size:16px;
+  cursor:pointer;
+}
+
+/* Header */
+header {
+  height:60px;
+  background:var(--card);
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:0 15px;
+  border-bottom:1px solid var(--border);
+}
+
+main {
+  flex:1;
+  padding:20px;
+}
+
+.card {
+  background:var(--card);
+  border:1px solid var(--border);
+  padding:15px;
+  border-radius:10px;
+  margin-bottom:10px;
+}
+</style>
 </head>
 
 <body>
 
-<!-- ================= UI (UNCHANGED) ================= -->
-<!-- Auth Screen, Main Screen, Chat, Call UI -->
-<!-- 👇 Tumhara diya hua HTML body exactly same rakha gaya hai -->
-<!-- Isliye yahan repeat nahi kar raha hoon -->
+<!-- AUTH SCREEN -->
+<div id="auth-screen" class="screen active">
+  <h2 style="text-align:center;color:var(--primary)">D+S Calling</h2>
+  <p style="text-align:center;color:#aaa">Login with Email</p>
 
-<!-- ================================================= -->
+  <input type="email" id="email-input" placeholder="Enter email" />
+  <button onclick="app.login()">Continue</button>
 
+  <p style="text-align:center;font-size:12px;color:#666">
+    Protected by Firebase Authentication
+  </p>
+</div>
+
+<!-- MAIN APP -->
+<div id="main-screen" class="screen">
+  <header>
+    <h3>D+S Calling</h3>
+    <i class="fas fa-sign-out-alt" onclick="app.logout()" style="cursor:pointer"></i>
+  </header>
+
+  <main>
+    <div class="card">
+      <h4>Chats</h4>
+      <p style="color:#aaa">Chat UI will load here</p>
+    </div>
+
+    <div class="card">
+      <h4>Calls</h4>
+      <p style="color:#aaa">Audio / Video calling UI</p>
+    </div>
+
+    <div class="card">
+      <h4>Status</h4>
+      <p id="user-email"></p>
+    </div>
+  </main>
+</div>
+
+<!-- FIREBASE + SAM LOGIC -->
 <script type="module">
-/* ================= FIREBASE SETUP ================= */
-
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
 import {
   getAuth,
@@ -41,47 +147,26 @@ const firebaseConfig = {
   projectId: "ds-calling",
   storageBucket: "ds-calling.firebasestorage.app",
   messagingSenderId: "1083574697798",
-  appId: "1:1083574697798:web:8f087f4bea903a0add2f47",
-  measurementId: "G-4SMR31C9FG"
+  appId: "1:1083574697798:web:8f087f4bea903a0add2f47"
 };
 
 const fbApp = initializeApp(firebaseConfig);
 const auth = getAuth(fbApp);
 
-/* ================= APP LOGIC ================= */
-
 window.app = {
-  user: null,
-  tempAuthData: {},
-
-  requestOtp() {
+  async login() {
     const email = document.getElementById("email-input").value.trim();
-    if (!email) {
-      alert("Email required");
-      return;
-    }
+    if (!email) return alert("Email required");
 
-    this.tempAuthData.email = email;
-
-    // UI switch only
-    document.getElementById("form-login").classList.remove("active");
-    document.getElementById("form-otp").classList.add("active");
-    document.getElementById("otp-target").innerText = email;
-  },
-
-  async verifyOtp() {
-    const email = this.tempAuthData.email;
-    const password = "Temp@12345"; // DEV password
+    const password = "Temp@12345";
 
     try {
-      const cred = await signInWithEmailAndPassword(auth, email, password);
-      this.user = cred.user;
-    } catch (err) {
-      if (err.code === "auth/user-not-found") {
-        const cred = await createUserWithEmailAndPassword(auth, email, password);
-        this.user = cred.user;
+      await signInWithEmailAndPassword(auth, email, password);
+    } catch (e) {
+      if (e.code === "auth/user-not-found") {
+        await createUserWithEmailAndPassword(auth, email, password);
       } else {
-        alert(err.message);
+        alert(e.message);
       }
     }
   },
@@ -91,15 +176,14 @@ window.app = {
   }
 };
 
-/* ================= AUTH STATE ================= */
+/* SAM = single source of truth */
+onAuthStateChanged(auth, user => {
+  document.getElementById("auth-screen").classList.toggle("active", !user);
+  document.getElementById("main-screen").classList.toggle("active", !!user);
 
-onAuthStateChanged(auth, (user) => {
   if (user) {
-    document.getElementById("auth-screen").classList.remove("active");
-    document.getElementById("main-screen").classList.add("active");
-  } else {
-    document.getElementById("main-screen").classList.remove("active");
-    document.getElementById("auth-screen").classList.add("active");
+    document.getElementById("user-email").innerText =
+      "Logged in as: " + user.email;
   }
 });
 </script>
