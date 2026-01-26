@@ -221,30 +221,93 @@
             display: none;
         }
 
-        /* === Main View === */
-        .main-header {
-            background-color: var(--wa-header-bg);
-            color: white;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            z-index: 10;
-        }
-
-        .header-top {
+        /* === New Main Header === */
+        .new-main-header {
+            background-color: white;
+            padding: 12px 16px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 10px 16px;
+            border-bottom: 1px solid var(--wa-border-color);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
         }
 
-        .header-top h2 {
-            font-size: 1.5rem;
+        .profile-section {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+        }
+
+        .profile-emoji-small {
+            font-size: 1.8rem;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--wa-app-bg);
+            border-radius: 50%;
+        }
+
+        .profile-name-small {
             font-weight: 500;
+            color: var(--wa-text-primary);
+            font-size: 1rem;
+        }
+
+        .menu-section {
+            position: relative;
+        }
+
+        .dropdown-menu {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            min-width: 200px;
+            z-index: 1000;
+            display: none;
+            overflow: hidden;
+        }
+
+        .dropdown-menu.show {
+            display: block;
+        }
+
+        .dropdown-item {
+            padding: 14px 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+            color: var(--wa-text-primary);
+            border-bottom: 1px solid var(--wa-border-color);
+            transition: background-color 0.2s;
+            cursor: pointer;
+        }
+
+        .dropdown-item:last-child {
+            border-bottom: none;
+        }
+
+        .dropdown-item:hover {
+            background-color: var(--wa-app-bg);
+        }
+
+        .dropdown-item i {
+            width: 20px;
+            text-align: center;
         }
 
         .header-nav {
             display: flex;
             justify-content: space-around;
+            background-color: white;
             padding: 0 10px;
+            border-bottom: 1px solid var(--wa-border-color);
         }
 
         .nav-tab {
@@ -252,7 +315,7 @@
             text-align: center;
             padding: 14px 5px;
             font-weight: 500;
-            color: rgba(255, 255, 255, 0.8);
+            color: var(--wa-text-secondary);
             background: none;
             border: none;
             border-bottom: 3px solid transparent;
@@ -263,12 +326,12 @@
         }
 
         .nav-tab.active {
-            color: white;
-            border-bottom-color: var(--wa-active-tab-indicator);
+            color: var(--wa-accent-blue);
+            border-bottom-color: var(--wa-accent-blue);
         }
 
         .nav-tab:hover {
-            background-color: rgba(255, 255, 255, 0.05);
+            background-color: rgba(0, 0, 0, 0.05);
         }
 
         .badge {
@@ -373,16 +436,17 @@
 
         /* === Chat View === */
         .chat-header {
-            background-color: var(--wa-header-bg);
-            color: white;
-            padding: 10px 16px;
+            background-color: white;
+            color: var(--wa-text-primary);
+            padding: 12px 16px;
             display: flex;
             align-items: center;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            border-bottom: 1px solid var(--wa-border-color);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
         }
 
         .chat-header .icon-btn svg {
-            fill: white;
+            fill: var(--wa-text-secondary);
         }
 
         .chat-back-btn {
@@ -398,6 +462,13 @@
         .contact-emoji {
             font-size: 1.8rem;
             margin-right: 12px;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--wa-app-bg);
+            border-radius: 50%;
         }
 
         .contact-name {
@@ -405,9 +476,28 @@
             font-size: 1.1rem;
         }
 
-        .chat-actions {
+        .chat-menu-dropdown {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            min-width: 180px;
+            z-index: 1000;
+            display: none;
+            overflow: hidden;
+        }
+
+        .chat-menu-dropdown.show {
+            display: block;
+        }
+
+        /* Add this for call buttons in chat header */
+        .chat-call-buttons {
             display: flex;
             gap: 5px;
+            margin-right: 10px;
         }
 
         #chat-messages {
@@ -1047,6 +1137,55 @@
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
+        
+        /* Dark mode styles */
+        .dark-mode {
+            --wa-header-bg: #1a1a1a;
+            --wa-accent-blue: #2a9df4;
+            --wa-message-out-bg: #005c4b;
+            --wa-message-in-bg: #202c33;
+            --wa-app-bg: #0c1317;
+            --wa-chat-bg: #0c1317;
+            --wa-icon-color: #aebac1;
+            --wa-text-primary: #e9edef;
+            --wa-text-secondary: #8696a0;
+            --wa-border-color: #2a3942;
+            --wa-button-color: #00a884;
+            --wa-link-color: #53bdeb;
+            --wa-shadow: rgba(11, 20, 26, 0.85);
+            --wa-group-color: #6a11cb;
+        }
+        
+        .dark-mode #app-container {
+            background-color: #111b21;
+        }
+        
+        .dark-mode .new-main-header,
+        .dark-mode .header-nav,
+        .dark-mode .chat-header,
+        .dark-mode .modal-content,
+        .dark-mode .content-panel,
+        .dark-mode .list-item,
+        .dark-mode .dropdown-menu,
+        .dark-mode .chat-menu-dropdown {
+            background-color: #202c33;
+            color: var(--wa-text-primary);
+        }
+        
+        .dark-mode .nav-tab {
+            color: var(--wa-text-secondary);
+        }
+        
+        .dark-mode .nav-tab.active {
+            color: var(--wa-accent-blue);
+        }
+        
+        .dark-mode .form-group input,
+        .dark-mode #chat-input {
+            background-color: #2a3942;
+            border-color: #2a3942;
+            color: var(--wa-text-primary);
+        }
     </style>
 </head>
 <body>
@@ -1098,43 +1237,63 @@
         
         <!-- === MAIN APP VIEW === -->
         <div id="main-view" class="view hidden">
-            <header class="main-header">
-                <div class="header-top">
-                    <h2>DS Calling</h2>
-                    <div class="header-actions">
-                        <button id="add-friend-btn" class="icon-btn" title="Add Friend">
-                            <svg viewBox="0 0 24 24">
-                                <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
-                            </svg>
-                        </button>
-                        <button id="create-group-btn" class="icon-btn" title="Create Group">
-                            <svg viewBox="0 0 24 24">
-                                <path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/>
-                            </svg>
-                        </button>
-                        <button id="menu-btn" class="icon-btn" title="Profile & Settings">
-                            <svg viewBox="0 0 24 24">
-                                <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
-                            </svg>
-                        </button>
-                    </div>
+            <!-- New Header with Profile on left and Menu on right -->
+            <header class="new-main-header">
+                <div class="profile-section" id="profile-btn">
+                    <div class="profile-emoji-small" id="profile-emoji-small">👤</div>
+                    <div class="profile-name-small" id="profile-name-small">User</div>
                 </div>
                 
-                <nav class="header-nav">
-                    <button id="nav-home" class="nav-tab active" data-panel="home-content">
-                        Chats <span class="badge" id="chats-badge">0</span>
+                <div class="menu-section">
+                    <button id="menu-btn" class="icon-btn" title="Menu">
+                        <i class="fas fa-bars"></i>
                     </button>
-                    <button id="nav-groups" class="nav-tab" data-panel="groups-content">
-                        Groups <span class="badge" id="groups-badge">0</span>
-                    </button>
-                    <button id="nav-notifications" class="nav-tab" data-panel="notifications-content">
-                        Updates <span class="badge" id="updates-badge">0</span>
-                    </button>
-                    <button id="nav-calls" class="nav-tab" data-panel="calls-content">
-                        Calls <span class="badge" id="calls-badge">0</span>
-                    </button>
-                </nav>
+                    
+                    <!-- Dropdown Menu -->
+                    <div id="main-menu-dropdown" class="dropdown-menu">
+                        <a href="#" class="dropdown-item" id="menu-add-friend">
+                            <i class="fas fa-user-plus"></i> Add Friend
+                        </a>
+                        <a href="#" class="dropdown-item" id="menu-create-group">
+                            <i class="fas fa-users"></i> Create Group
+                        </a>
+                        <a href="#" class="dropdown-item" id="menu-notifications">
+                            <i class="fas fa-bell"></i> Notifications
+                            <span class="badge" id="dropdown-updates-badge" style="margin-left: auto;">0</span>
+                        </a>
+                        <a href="#" class="dropdown-item" id="menu-calls">
+                            <i class="fas fa-phone"></i> Calls
+                            <span class="badge" id="dropdown-calls-badge" style="margin-left: auto;">0</span>
+                        </a>
+                        <!-- Added Dark/Light Mode options -->
+                        <a href="#" class="dropdown-item" id="menu-dark-mode">
+                            <i class="fas fa-moon"></i> Dark Mode
+                        </a>
+                        <a href="#" class="dropdown-item" id="menu-light-mode">
+                            <i class="fas fa-sun"></i> Light Mode
+                        </a>
+                        <a href="#" class="dropdown-item" id="menu-settings">
+                            <i class="fas fa-cog"></i> Settings
+                        </a>
+                    </div>
+                </div>
             </header>
+            
+            <!-- Navigation Tabs -->
+            <nav class="header-nav">
+                <button id="nav-home" class="nav-tab active" data-panel="home-content">
+                    Chats <span class="badge" id="chats-badge">0</span>
+                </button>
+                <button id="nav-groups" class="nav-tab" data-panel="groups-content">
+                    Groups <span class="badge" id="groups-badge">0</span>
+                </button>
+                <button id="nav-updates" class="nav-tab" data-panel="notifications-content">
+                    Updates <span class="badge" id="updates-badge">0</span>
+                </button>
+                <button id="nav-calls" class="nav-tab" data-panel="calls-content">
+                    Calls <span class="badge" id="calls-badge">0</span>
+                </button>
+            </nav>
             
             <main id="main-content">
                 <!-- Chats Panel -->
@@ -1185,7 +1344,7 @@
                     <div class="contact-emoji" id="chat-contact-emoji">👤</div>
                     <div>
                         <div class="contact-name" id="chat-contact-name">Contact Name</div>
-                        <div id="typing-indicator" style="font-size: 0.8rem; color: rgba(255,255,255,0.7); display: none;">
+                        <div id="typing-indicator" style="font-size: 0.8rem; color: var(--wa-text-secondary); display: none;">
                             <span class="typing-dots">
                                 <span class="typing-dot"></span>
                                 <span class="typing-dot"></span>
@@ -1196,22 +1355,33 @@
                     </div>
                 </div>
                 
-                <div class="chat-actions">
-                    <button id="voice-call-btn" class="icon-btn" title="Voice Call">
-                        <svg viewBox="0 0 24 24">
-                            <path d="M6.54 5c.06.89.21 1.76.45 2.59l-1.2 1.2c-.41-1.2-.67-2.47-.76-3.79h1.51m9.86 12.02c.85.24 1.72.39 2.6.45v1.49c-1.32-.09-2.59-.35-3.8-.75l1.2-1.19M7.5 3H4c-.55 0-1 .45-1 1 0 9.39 7.61 17 17 17 .55 0 1-.45 1-1v-3.49c0-.55-.45-1-1-1-1.24 0-2.45-.2-3.57-.57-.1-.04-.21-.05-.31-.05-.26 0-.51.1-.71.29l-2.2 2.2c-2.83-1.45-5.15-3.76-6.59-6.59l2.2-2.2c.28-.28.36-.67.25-1.02C8.7 6.45 8.5 5.25 8.5 4c0-.55-.45-1-1-1z"/>
-                        </svg>
+                <!-- Added call buttons in chat header -->
+                <div class="chat-call-buttons">
+                    <button id="chat-voice-call-btn" class="icon-btn" title="Voice Call">
+                        <i class="fas fa-phone"></i>
                     </button>
-                    <button id="video-call-btn" class="icon-btn" title="Video Call">
-                        <svg viewBox="0 0 24 24">
-                            <path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"/>
-                        </svg>
+                    <button id="chat-video-call-btn" class="icon-btn" title="Video Call">
+                        <i class="fas fa-video"></i>
                     </button>
-                    <button id="chat-more-btn" class="icon-btn" title="More options">
-                        <svg viewBox="0 0 24 24">
-                            <path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/>
-                        </svg>
+                </div>
+                
+                <div class="menu-section">
+                    <button id="chat-menu-btn" class="icon-btn" title="Menu">
+                        <i class="fas fa-ellipsis-v"></i>
                     </button>
+                    
+                    <!-- Chat Menu Dropdown - Removed call options -->
+                    <div id="chat-menu-dropdown" class="chat-menu-dropdown">
+                        <a href="#" class="dropdown-item" id="chat-menu-view-profile">
+                            <i class="fas fa-user"></i> View Profile
+                        </a>
+                        <a href="#" class="dropdown-item" id="chat-menu-media">
+                            <i class="fas fa-images"></i> Media & Files
+                        </a>
+                        <a href="#" class="dropdown-item" id="chat-menu-search">
+                            <i class="fas fa-search"></i> Search Messages
+                        </a>
+                    </div>
                 </div>
             </header>
             
@@ -1283,28 +1453,35 @@
                     <div class="contact-emoji group-emoji" id="group-chat-emoji">👥</div>
                     <div>
                         <div class="contact-name" id="group-chat-name">Group Name</div>
-                        <div id="group-typing-indicator" style="font-size: 0.8rem; color: rgba(255,255,255,0.7); display: none;">
+                        <div id="group-typing-indicator" style="font-size: 0.8rem; color: var(--wa-text-secondary); display: none;">
                             <span id="group-typing-text"></span>
                         </div>
                     </div>
                 </div>
                 
-                <div class="chat-actions">
-                    <button id="group-voice-call-btn" class="icon-btn" title="Group Voice Call">
-                        <svg viewBox="0 0 24 24">
-                            <path d="M12 4c1.1 0 2 .9 2 2s-.9 2-2 2-2-.9-2-2 .9-2 2-2zm6 6c0-1.3.8-2.4 2-2.8V4c0-1.1-.9-2-2-2h-4c-1.1 0-2 .9-2 2v1.2c-1.2.4-2 1.5-2 2.8v6l-2 2v2h8v-2l-2-2V10zm-2 8h-4v-2h4v2z"/>
-                        </svg>
+                <div class="menu-section">
+                    <button id="group-chat-menu-btn" class="icon-btn" title="Menu">
+                        <i class="fas fa-ellipsis-v"></i>
                     </button>
-                    <button id="group-video-call-btn" class="icon-btn" title="Group Video Call">
-                        <svg viewBox="0 0 24 24">
-                            <path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 14H4V6h16v12z"/>
-                        </svg>
-                    </button>
-                    <button id="group-info-btn" class="icon-btn" title="Group Info">
-                        <svg viewBox="0 0 24 24">
-                            <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 15.5c-3.33 0-6-1.57-6-3.5s2.67-3.5 6-3.5 6 1.57 6 3.5-2.67 3.5-6 3.5z"/>
-                        </svg>
-                    </button>
+                    
+                    <!-- Group Chat Menu Dropdown -->
+                    <div id="group-chat-menu-dropdown" class="chat-menu-dropdown">
+                        <a href="#" class="dropdown-item" id="group-menu-voice-call">
+                            <i class="fas fa-phone"></i> Group Voice Call
+                        </a>
+                        <a href="#" class="dropdown-item" id="group-menu-video-call">
+                            <i class="fas fa-video"></i> Group Video Call
+                        </a>
+                        <a href="#" class="dropdown-item" id="group-menu-info">
+                            <i class="fas fa-info-circle"></i> Group Info
+                        </a>
+                        <a href="#" class="dropdown-item" id="group-menu-members">
+                            <i class="fas fa-users"></i> View Members
+                        </a>
+                        <a href="#" class="dropdown-item" id="group-menu-media">
+                            <i class="fas fa-images"></i> Group Media
+                        </a>
+                    </div>
                 </div>
             </header>
             
@@ -1933,6 +2110,7 @@
         let selectedFile = null;
         let typingTimeout = null;
         let emojiPickerVisible = false;
+        let darkMode = false;
         
         // User data cache
         let userProfile = null;
@@ -2170,6 +2348,8 @@
                     
                     document.getElementById('profile-name-display').textContent = userProfile.name;
                     document.getElementById('profile-emoji-display').textContent = userProfile.emoji;
+                    document.getElementById('profile-name-small').textContent = userProfile.name;
+                    document.getElementById('profile-emoji-small').textContent = userProfile.emoji;
                     
                     showSuccess('profile-update-error', 'Profile updated successfully!');
                     
@@ -2182,9 +2362,42 @@
         });
 
         // ====================
+        // DROPDOWN MENU MANAGEMENT
+        // ====================
+        // Main menu dropdown
+        document.getElementById('menu-btn').addEventListener('click', (e) => {
+            e.stopPropagation();
+            const dropdown = document.getElementById('main-menu-dropdown');
+            dropdown.classList.toggle('show');
+        });
+
+        // Chat menu dropdown
+        document.getElementById('chat-menu-btn').addEventListener('click', (e) => {
+            e.stopPropagation();
+            const dropdown = document.getElementById('chat-menu-dropdown');
+            dropdown.classList.toggle('show');
+        });
+
+        // Group chat menu dropdown
+        document.getElementById('group-chat-menu-btn').addEventListener('click', (e) => {
+            e.stopPropagation();
+            const dropdown = document.getElementById('group-chat-menu-dropdown');
+            dropdown.classList.toggle('show');
+        });
+
+        // Close dropdowns when clicking outside
+        document.addEventListener('click', () => {
+            document.getElementById('main-menu-dropdown').classList.remove('show');
+            document.getElementById('chat-menu-dropdown').classList.remove('show');
+            document.getElementById('group-chat-menu-dropdown').classList.remove('show');
+        });
+
+        // ====================
         // FRIEND SYSTEM
         // ====================
-        document.getElementById('add-friend-btn').addEventListener('click', () => {
+        document.getElementById('menu-add-friend').addEventListener('click', (e) => {
+            e.preventDefault();
+            document.getElementById('main-menu-dropdown').classList.remove('show');
             showModal('add-friend-modal');
         });
 
@@ -2297,6 +2510,7 @@
                     });
                     
                     document.getElementById('updates-badge').textContent = requestCount;
+                    document.getElementById('dropdown-updates-badge').textContent = requestCount;
                     
                     document.querySelectorAll('.accept-request-btn').forEach(btn => {
                         btn.addEventListener('click', (e) => {
@@ -2313,6 +2527,7 @@
                     });
                 } else {
                     document.getElementById('updates-badge').textContent = '0';
+                    document.getElementById('dropdown-updates-badge').textContent = '0';
                 }
             });
         }
@@ -2346,7 +2561,7 @@
             }, 3000);
         }
 
-        // Listen for contacts
+        // Listen for contacts - FIXED: Click directly opens chat
         function listenForContacts() {
             if (!currentUser) return;
             
@@ -2385,8 +2600,9 @@
                             
                             chatsList.appendChild(contactElement);
                             
+                            // FIXED: Click directly opens chat, not profile
                             contactElement.addEventListener('click', () => {
-                                openFriendProfile(contactUid, contactProfile);
+                                openChat(contactUid, contactProfile);
                             });
                         }
                     }
@@ -2440,6 +2656,21 @@
             
             document.getElementById('chat-contact-emoji').textContent = contactProfile.emoji;
             document.getElementById('chat-contact-name').textContent = contactProfile.name;
+            
+            // Set up call buttons in header
+            document.getElementById('chat-voice-call-btn').onclick = () => {
+                startCall(contactUid, false);
+            };
+            
+            document.getElementById('chat-video-call-btn').onclick = () => {
+                startCall(contactUid, true);
+            };
+            
+            // Set up chat menu buttons (without call options)
+            document.getElementById('chat-menu-view-profile').onclick = () => {
+                document.getElementById('chat-menu-dropdown').classList.remove('show');
+                openFriendProfile(contactUid, contactProfile);
+            };
             
             database.ref(`unreadCounts/${currentUser.uid}/${contactUid}`).set(0);
             unreadCounts[contactUid] = 0;
@@ -3303,7 +3534,9 @@
         // ====================
         // GROUP SYSTEM
         // ====================
-        document.getElementById('create-group-btn').addEventListener('click', () => {
+        document.getElementById('menu-create-group').addEventListener('click', (e) => {
+            e.preventDefault();
+            document.getElementById('main-menu-dropdown').classList.remove('show');
             showCreateGroupModal();
         });
 
@@ -3462,6 +3695,22 @@
             document.getElementById('group-chat-emoji').textContent = groupData.emoji;
             document.getElementById('group-chat-name').textContent = groupData.name;
             
+            // Set up group chat menu buttons
+            document.getElementById('group-menu-voice-call').onclick = () => {
+                document.getElementById('group-chat-menu-dropdown').classList.remove('show');
+                alert('Group voice call feature would start here');
+            };
+            
+            document.getElementById('group-menu-video-call').onclick = () => {
+                document.getElementById('group-chat-menu-dropdown').classList.remove('show');
+                alert('Group video call feature would start here');
+            };
+            
+            document.getElementById('group-menu-info').onclick = () => {
+                document.getElementById('group-chat-menu-dropdown').classList.remove('show');
+                showGroupInfoModal(groupData);
+            };
+            
             database.ref(`groupUnreadCounts/${currentUser.uid}/${groupId}`).set(0);
             groupUnreadCounts[groupId] = 0;
             
@@ -3603,12 +3852,6 @@
         // ====================
         // GROUP MANAGEMENT
         // ====================
-        document.getElementById('group-info-btn').addEventListener('click', () => {
-            if (currentGroup) {
-                showGroupInfoModal(currentGroup);
-            }
-        });
-
         function showGroupInfoModal(group) {
             document.getElementById('group-info-title').textContent = 'Group Info';
             document.getElementById('group-info-emoji').textContent = group.emoji;
@@ -3766,14 +4009,32 @@
         }
 
         // ====================
+        // DARK/LIGHT MODE FUNCTIONS
+        // ====================
+        function enableDarkMode() {
+            document.documentElement.classList.add('dark-mode');
+            darkMode = true;
+            localStorage.setItem('theme', 'dark');
+        }
+        
+        function enableLightMode() {
+            document.documentElement.classList.remove('dark-mode');
+            darkMode = false;
+            localStorage.setItem('theme', 'light');
+        }
+
+        // ====================
         // APP INITIALIZATION
         // ====================
         function initApp() {
             if (!currentUser || !userProfile) return;
             
+            // Update profile display
             document.getElementById('profile-name-display').textContent = userProfile.name;
             document.getElementById('profile-emoji-display').textContent = userProfile.emoji;
             document.getElementById('profile-id-display').textContent = userProfile.userId;
+            document.getElementById('profile-name-small').textContent = userProfile.name;
+            document.getElementById('profile-emoji-small').textContent = userProfile.emoji;
             
             // Set up navigation
             document.querySelectorAll('.nav-tab').forEach(tab => {
@@ -3792,17 +4053,41 @@
                 showView('main-view');
             });
             
-            // Set up call buttons
-            document.getElementById('voice-call-btn').addEventListener('click', () => {
-                if (currentChatPartner) {
-                    startCall(currentChatPartner.uid, false);
-                }
+            // Set up profile button
+            document.getElementById('profile-btn').addEventListener('click', () => {
+                showModal('profile-view-modal');
             });
             
-            document.getElementById('video-call-btn').addEventListener('click', () => {
-                if (currentChatPartner) {
-                    startCall(currentChatPartner.uid, true);
-                }
+            // Set up menu buttons
+            document.getElementById('menu-notifications').addEventListener('click', (e) => {
+                e.preventDefault();
+                document.getElementById('main-menu-dropdown').classList.remove('show');
+                showPanel('notifications-content');
+            });
+            
+            document.getElementById('menu-calls').addEventListener('click', (e) => {
+                e.preventDefault();
+                document.getElementById('main-menu-dropdown').classList.remove('show');
+                showPanel('calls-content');
+            });
+            
+            // Set up dark/light mode buttons
+            document.getElementById('menu-dark-mode').addEventListener('click', (e) => {
+                e.preventDefault();
+                document.getElementById('main-menu-dropdown').classList.remove('show');
+                enableDarkMode();
+            });
+            
+            document.getElementById('menu-light-mode').addEventListener('click', (e) => {
+                e.preventDefault();
+                document.getElementById('main-menu-dropdown').classList.remove('show');
+                enableLightMode();
+            });
+            
+            document.getElementById('menu-settings').addEventListener('click', (e) => {
+                e.preventDefault();
+                document.getElementById('main-menu-dropdown').classList.remove('show');
+                showModal('profile-view-modal');
             });
             
             // Set up end call buttons
@@ -3814,11 +4099,6 @@
             document.getElementById('mute-voice-call-btn').addEventListener('click', toggleMute);
             document.getElementById('speaker-video-call-btn').addEventListener('click', toggleSpeaker);
             document.getElementById('speaker-voice-call-btn').addEventListener('click', toggleSpeaker);
-            
-            // Set up menu button
-            document.getElementById('menu-btn').addEventListener('click', () => {
-                showModal('profile-view-modal');
-            });
             
             // Set up logout button
             document.getElementById('logout-btn').addEventListener('click', () => {
@@ -3860,6 +4140,14 @@
             
             // Load call logs
             loadCallLogs();
+            
+            // Load theme preference
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'dark') {
+                enableDarkMode();
+            } else {
+                enableLightMode();
+            }
         }
 
         function loadCallLogs() {
@@ -3914,6 +4202,12 @@
                             }
                         }
                     }
+                    
+                    document.getElementById('calls-badge').textContent = Object.keys(logs || {}).length;
+                    document.getElementById('dropdown-calls-badge').textContent = Object.keys(logs || {}).length;
+                } else {
+                    document.getElementById('calls-badge').textContent = '0';
+                    document.getElementById('dropdown-calls-badge').textContent = '0';
                 }
             });
         }
