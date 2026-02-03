@@ -6,6 +6,8 @@
     <title>DS Calling </title>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Agora SDK -->
+    <script src="https://download.agora.io/sdk/release/AgoraRTC_N-4.20.2.js"></script>
     <style>
         /* === CSS Variables & Global Styles === */
         :root {
@@ -1322,10 +1324,10 @@
         }
         
         /* ========================= */
-        /* SIMPLE CALL SCREEN STYLES */
+        /* AGORA CALL SCREEN STYLES */
         /* ========================= */
         
-        #simple-call-screen {
+        #agora-call-screen {
             position: fixed;
             inset: 0;
             background: #000;
@@ -1336,16 +1338,30 @@
             z-index: 2000;
         }
         
-        #simple-call-screen video {
+        #agora-remote-video {
             width: 100%;
             height: 100%;
             object-fit: cover;
         }
         
-        #simple-end-call {
+        #agora-local-video {
+            position: absolute;
+            bottom: 100px;
+            right: 20px;
+            width: 120px;
+            height: 160px;
+            object-fit: cover;
+            border-radius: 10px;
+            border: 2px solid white;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        #agora-end-call {
             position: absolute;
             bottom: 30px;
-            background: red;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #ff3b30;
             color: #fff;
             border: none;
             padding: 15px 25px;
@@ -1353,6 +1369,123 @@
             font-size: 16px;
             cursor: pointer;
             z-index: 2001;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        #agora-end-call:hover {
+            background: #ff1a1a;
+        }
+        
+        #agora-call-controls {
+            position: absolute;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 15px;
+            z-index: 2001;
+        }
+        
+        .agora-call-btn {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            border: none;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.3s;
+        }
+        
+        .agora-call-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+        
+        .agora-call-btn.active {
+            background: var(--wa-accent-blue);
+        }
+        
+        .agora-call-btn.muted {
+            background: var(--wa-danger);
+        }
+        
+        /* Group call grid for Agora */
+        #agora-participants-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            padding: 20px;
+            width: 100%;
+            height: 100%;
+            overflow-y: auto;
+        }
+        
+        .agora-participant-tile {
+            position: relative;
+            background: #333;
+            border-radius: 10px;
+            overflow: hidden;
+            aspect-ratio: 4/3;
+        }
+        
+        .agora-participant-video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .agora-participant-info {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0,0,0,0.7);
+            padding: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: white;
+        }
+        
+        .agora-participant-name {
+            font-size: 14px;
+            flex: 1;
+        }
+        
+        .agora-participant-muted {
+            color: #ff3b30;
+        }
+        
+        /* Loading overlay for Agora */
+        #agora-loading {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            z-index: 2002;
+        }
+        
+        .agora-spinner {
+            width: 50px;
+            height: 50px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid var(--wa-accent-blue);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
         }
         
         /* Simple chat styles */
@@ -1617,10 +1750,10 @@
                 
                 <!-- Added call buttons in chat header -->
                 <div class="chat-call-buttons">
-                    <button id="chat-voice-call-btn" class="icon-btn" title="Voice Call" onclick="startSimpleAudioCall()">
+                    <button id="chat-voice-call-btn" class="icon-btn" title="Voice Call" onclick="startAgoraAudioCall()">
                         <i class="fas fa-phone"></i>
                     </button>
-                    <button id="chat-video-call-btn" class="icon-btn" title="Video Call" onclick="startSimpleVideoCall()">
+                    <button id="chat-video-call-btn" class="icon-btn" title="Video Call" onclick="startAgoraVideoCall()">
                         <i class="fas fa-video"></i>
                     </button>
                 </div>
@@ -1726,10 +1859,10 @@
                 
                 <!-- Call buttons same as individual chat -->
                 <div class="chat-call-buttons">
-                    <button id="group-chat-voice-call-btn" class="icon-btn" title="Group Voice Call" onclick="startSimpleGroupAudioCall()">
+                    <button id="group-chat-voice-call-btn" class="icon-btn" title="Group Voice Call" onclick="startAgoraGroupAudioCall()">
                         <i class="fas fa-phone"></i>
                     </button>
-                    <button id="group-chat-video-call-btn" class="icon-btn" title="Group Video Call" onclick="startSimpleGroupVideoCall()">
+                    <button id="group-chat-video-call-btn" class="icon-btn" title="Group Video Call" onclick="startAgoraGroupVideoCall()">
                         <i class="fas fa-video"></i>
                     </button>
                 </div>
@@ -1814,10 +1947,40 @@
             </div>
         </div>
         
-        <!-- === SIMPLE CALL SCREEN === -->
-        <div id="simple-call-screen">
-            <video id="simple-local-video" autoplay playsinline></video>
-            <button id="simple-end-call" onclick="endSimpleCall()">End Call</button>
+        <!-- === AGORA CALL SCREEN === -->
+        <div id="agora-call-screen">
+            <!-- 1-on-1 call view -->
+            <video id="agora-remote-video" autoplay playsinline></video>
+            <video id="agora-local-video" autoplay playsinline muted></video>
+            
+            <!-- Group call view -->
+            <div id="agora-participants-grid" style="display: none;"></div>
+            
+            <!-- Loading overlay -->
+            <div id="agora-loading" style="display: none;">
+                <div class="agora-spinner"></div>
+                <div id="agora-loading-text">Connecting...</div>
+            </div>
+            
+            <!-- Call controls -->
+            <div id="agora-call-controls">
+                <button id="agora-mic-toggle" class="agora-call-btn" title="Toggle Microphone">
+                    <i class="fas fa-microphone"></i>
+                </button>
+                <button id="agora-camera-toggle" class="agora-call-btn" title="Toggle Camera">
+                    <i class="fas fa-video"></i>
+                </button>
+                <button id="agora-switch-camera" class="agora-call-btn" title="Switch Camera">
+                    <i class="fas fa-sync-alt"></i>
+                </button>
+                <button id="agora-switch-speaker" class="agora-call-btn" title="Switch Speaker">
+                    <i class="fas fa-volume-up"></i>
+                </button>
+            </div>
+            
+            <button id="agora-end-call" onclick="endAgoraCall()">
+                <i class="fas fa-phone-slash"></i> End Call
+            </button>
         </div>
 
         <!-- === MODALS === -->
@@ -2386,22 +2549,38 @@
     const storage = firebase.storage();
 
     // ====================
+    // AGORA CONFIGURATION
+    // ====================
+    // REPLACE THESE WITH YOUR AGORA CREDENTIALS
+    const AGORA_APP_ID = "eece2833b1fd493fa9fa490041be5140"; // Replace with your Agora App ID
+    const AGORA_TEMP_TOKEN = "007eJxTYLAvlF4qe5NR2eyw/JLstRMm8cYnHO7nOrf95Pddy0q+7j6swJCampxqZGFsnGSYlmJiaZyWaJmWaGJpYGBimJRqamhiILiuIbMhkJEhr/ANMyMDBIL4XAwuwQrOiTk5mXnpDAwAJpYh9w=="; // Replace with your temporary token
+    
+    // Agora variables
+    let agoraClient = null;
+    let localTracks = {
+        audioTrack: null,
+        videoTrack: null
+    };
+    let remoteUsers = {};
+    let isAudioMuted = false;
+    let isVideoMuted = false;
+    let currentChannel = null;
+    let isGroupCall = false;
+    
+    // Agora configuration
+    const agoraConfig = {
+        mode: "rtc",
+        codec: "vp8"
+    };
+
+    // ====================
     // GLOBAL STATE VARIABLES
     // ====================
     let currentUser = null;
     let currentChatPartner = null;
     let currentGroup = null;
-    let peerConnection = null;
-    let localStream = null;
-    let remoteStream = null;
-    let currentCallId = null;
     let callTimer = null;
     let callStartTime = null;
-    let isMuted = false;
-    let isSpeakerOn = true;
-    let mediaRecorder = null;
-    let audioChunks = [];
-    let isRecording = false;
     let selectedFile = null;
     let typingTimeout = null;
     let emojiPickerVisible = false;
@@ -2425,213 +2604,510 @@
     let selectedMemberId = null;
     let selectedCallParticipantId = null;
 
-    // WebRTC Configuration
-    const servers = {
-        iceServers: [
-            {
-                urls: ['stun:stun1.l.google.com:19302', 'stun:stun2.l.google.com:19302']
-            }
-        ],
-        iceCandidatePoolSize: 10,
-    };
-
     // ====================
-    // SIMPLE CALL FUNCTIONS (FIXED)
+    // AGORA FUNCTIONS (REPLACEMENT)
     // ====================
-    async function startSimpleAudioCall() {
+    async function startAgoraAudioCall() {
         if (!currentChatPartner) return;
         activeCallType = 'audio';
-        await initiateCall(false);
+        await initiateAgoraCall(false);
     }
 
-    async function startSimpleVideoCall() {
+    async function startAgoraVideoCall() {
         if (!currentChatPartner) return;
         activeCallType = 'video';
-        await initiateCall(true);
+        await initiateAgoraCall(true);
     }
 
-    function startSimpleGroupAudioCall() {
-        // Group calls require more complex SFU/MCU logic or mesh networking.
-        // For this simple fix, we will treat it as a 1-on-1 call with the first member found or alert limitation.
-        alert("Group calling requires advanced server infrastructure. Please use 1-on-1 calling for now.");
+    async function startAgoraGroupAudioCall() {
+        if (!currentGroup) return;
+        activeCallType = 'audio';
+        isGroupCall = true;
+        await initiateAgoraGroupCall(false);
     }
 
-    function startSimpleGroupVideoCall() {
-        alert("Group calling requires advanced server infrastructure. Please use 1-on-1 calling for now.");
+    async function startAgoraGroupVideoCall() {
+        if (!currentGroup) return;
+        activeCallType = 'video';
+        isGroupCall = true;
+        await initiateAgoraGroupCall(true);
     }
 
-    async function initiateCall(isVideo) {
-        currentCallId = database.ref('calls').push().key;
-        const callDoc = database.ref(`calls/${currentCallId}`);
-        const offerCandidates = callDoc.child('offerCandidates');
-        const answerCandidates = callDoc.child('answerCandidates');
-
-        // Get Local Stream
+    async function initiateAgoraCall(isVideo) {
         try {
-            localStream = await navigator.mediaDevices.getUserMedia({
-                audio: true,
-                video: isVideo
-            });
-        } catch (err) {
-            console.error("Error accessing media devices:", err);
-            alert("Could not access camera/microphone.");
-            return;
-        }
-
-        // Setup Peer Connection
-        peerConnection = new RTCPeerConnection(servers);
-
-        // Push tracks to Peer Connection
-        localStream.getTracks().forEach((track) => {
-            peerConnection.addTrack(track, localStream);
-        });
-
-        // Handle Remote Stream
-        peerConnection.ontrack = (event) => {
-            event.streams[0].getTracks().forEach((track) => {
-                remoteStream = new MediaStream(); // Create new stream
-                remoteStream.addTrack(track);
+            // Show loading
+            document.getElementById('agora-loading').style.display = 'flex';
+            document.getElementById('agora-call-screen').style.display = 'flex';
+            
+            // Generate unique channel name
+            const channelName = `call_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+            currentChannel = channelName;
+            
+            // Initialize Agora client
+            agoraClient = AgoraRTC.createClient(agoraConfig);
+            
+            // Set up event listeners
+            agoraClient.on("user-published", handleUserPublished);
+            agoraClient.on("user-unpublished", handleUserUnpublished);
+            agoraClient.on("user-left", handleUserLeft);
+            
+            // Join the channel
+            const uid = await agoraClient.join(AGORA_APP_ID, channelName, AGORA_TEMP_TOKEN, null);
+            
+            // Create local tracks
+            if (isVideo) {
+                localTracks.videoTrack = await AgoraRTC.createCameraVideoTrack();
+                localTracks.audioTrack = await AgoraRTC.createMicrophoneAudioTrack();
                 
-                // Show Remote Video in the main video element
-                const remoteVideo = document.getElementById("simple-local-video");
-                remoteVideo.srcObject = event.streams[0];
-            });
-        };
-
-        // Handle ICE Candidates
-        peerConnection.onicecandidate = (event) => {
-            if (event.candidate) {
-                offerCandidates.push(event.candidate.toJSON());
+                // Play local video
+                document.getElementById('agora-local-video').srcObject = localTracks.videoTrack.getMediaStreamTrack();
+                document.getElementById('agora-local-video').play();
+                
+                // Publish both tracks
+                await agoraClient.publish([localTracks.audioTrack, localTracks.videoTrack]);
+            } else {
+                // Audio only
+                localTracks.audioTrack = await AgoraRTC.createMicrophoneAudioTrack();
+                await agoraClient.publish([localTracks.audioTrack]);
+                
+                // Hide local video for audio call
+                document.getElementById('agora-local-video').style.display = 'none';
             }
-        };
-
-        // Create Offer
-        const offerDescription = await peerConnection.createOffer();
-        await peerConnection.setLocalDescription(offerDescription);
-
-        const offer = {
-            sdp: offerDescription.sdp,
-            type: offerDescription.type,
-        };
-
-        await callDoc.set({ offer });
-
-        // Notify Recipient
-        database.ref(`incomingCalls/${currentChatPartner.uid}`).set({
-            callId: currentCallId,
-            callerId: currentUser.uid,
-            callerName: userProfile.name,
-            callerEmoji: userProfile.emoji,
-            type: isVideo ? 'video' : 'audio'
-        });
-
-        // Show Call Screen
-        document.getElementById("simple-call-screen").style.display = "flex";
-        
-        // Listen for Answer
-        callDoc.on('value', (snapshot) => {
-            const data = snapshot.val();
-            if (!peerConnection.currentRemoteDescription && data?.answer) {
-                const answerDescription = new RTCSessionDescription(data.answer);
-                peerConnection.setRemoteDescription(answerDescription);
-            }
-        });
-
-        // Listen for Remote ICE Candidates
-        answerCandidates.on('child_added', (snapshot) => {
-            const candidate = new RTCIceCandidate(snapshot.val());
-            peerConnection.addIceCandidate(candidate);
-        });
-    }
-
-    // Handle Incoming Call Acceptance
-    async function acceptIncomingCall(callData) {
-        currentCallId = callData.callId;
-        const callDoc = database.ref(`calls/${currentCallId}`);
-        const answerCandidates = callDoc.child('answerCandidates');
-        const offerCandidates = callDoc.child('offerCandidates');
-        const isVideo = callData.type === 'video';
-
-        try {
-            localStream = await navigator.mediaDevices.getUserMedia({
-                audio: true,
-                video: isVideo
-            });
-        } catch (err) {
-            console.error(err);
-            alert("Could not access media devices.");
-            return;
-        }
-
-        peerConnection = new RTCPeerConnection(servers);
-
-        localStream.getTracks().forEach((track) => {
-            peerConnection.addTrack(track, localStream);
-        });
-
-        peerConnection.ontrack = (event) => {
-            const remoteVideo = document.getElementById("simple-local-video");
-            remoteVideo.srcObject = event.streams[0];
-        };
-
-        peerConnection.onicecandidate = (event) => {
-            if (event.candidate) {
-                answerCandidates.push(event.candidate.toJSON());
-            }
-        };
-
-        // Fetch Offer
-        const callSnapshot = await callDoc.once('value');
-        const data = callSnapshot.val();
-        const offerDescription = data.offer;
-
-        await peerConnection.setRemoteDescription(new RTCSessionDescription(offerDescription));
-
-        const answerDescription = await peerConnection.createAnswer();
-        await peerConnection.setLocalDescription(answerDescription);
-
-        const answer = {
-            type: answerDescription.type,
-            sdp: answerDescription.sdp,
-        };
-
-        await callDoc.update({ answer });
-
-        offerCandidates.on('child_added', (snapshot) => {
-            const candidate = new RTCIceCandidate(snapshot.val());
-            peerConnection.addIceCandidate(candidate);
-        });
-
-        document.getElementById("simple-call-screen").style.display = "flex";
-    }
-
-    function endSimpleCall() {
-        if (peerConnection) {
-            peerConnection.close();
-            peerConnection = null;
-        }
-        if (localStream) {
-            localStream.getTracks().forEach(track => track.stop());
-            localStream = null;
-        }
-        
-        // Clean up Firebase
-        if (currentCallId) {
-            database.ref(`calls/${currentCallId}`).remove();
+            
+            // Notify recipient through Firebase
             if (currentChatPartner) {
-                database.ref(`incomingCalls/${currentChatPartner.uid}`).remove();
+                database.ref(`incomingCalls/${currentChatPartner.uid}`).set({
+                    callId: channelName,
+                    callerId: currentUser.uid,
+                    callerName: userProfile.name,
+                    callerEmoji: userProfile.emoji,
+                    type: isVideo ? 'video' : 'audio',
+                    isGroupCall: false
+                });
             }
-            // Also remove from self if I was the receiver
-            database.ref(`incomingCalls/${currentUser.uid}`).remove();
-            currentCallId = null;
+            
+            // Hide loading
+            document.getElementById('agora-loading').style.display = 'none';
+            
+            // Set up call controls
+            setupAgoraCallControls();
+            
+        } catch (error) {
+            console.error('Agora call error:', error);
+            document.getElementById('agora-loading').style.display = 'none';
+            alert('Failed to start call. Please try again.');
+            endAgoraCall();
         }
-
-        document.getElementById("simple-call-screen").style.display = "none";
-        // Reset video source
-        document.getElementById("simple-local-video").srcObject = null;
     }
 
-    // Listen for Incoming Calls
+    async function initiateAgoraGroupCall(isVideo) {
+        try {
+            // Show loading
+            document.getElementById('agora-loading').style.display = 'flex';
+            document.getElementById('agora-call-screen').style.display = 'flex';
+            document.getElementById('agora-remote-video').style.display = 'none';
+            document.getElementById('agora-participants-grid').style.display = 'grid';
+            
+            // Use group ID as channel name
+            const channelName = `group_${currentGroup.id}`;
+            currentChannel = channelName;
+            isGroupCall = true;
+            
+            // Initialize Agora client
+            agoraClient = AgoraRTC.createClient(agoraConfig);
+            
+            // Set up event listeners for group
+            agoraClient.on("user-published", handleGroupUserPublished);
+            agoraClient.on("user-unpublished", handleGroupUserUnpublished);
+            agoraClient.on("user-left", handleGroupUserLeft);
+            
+            // Join the channel
+            const uid = await agoraClient.join(AGORA_APP_ID, channelName, AGORA_TEMP_TOKEN, null);
+            
+            // Create local tracks
+            if (isVideo) {
+                localTracks.videoTrack = await AgoraRTC.createCameraVideoTrack();
+                localTracks.audioTrack = await AgoraRTC.createMicrophoneAudioTrack();
+                
+                // Add self to participants grid
+                addSelfToParticipantsGrid(isVideo);
+                
+                // Publish both tracks
+                await agoraClient.publish([localTracks.audioTrack, localTracks.videoTrack]);
+            } else {
+                // Audio only
+                localTracks.audioTrack = await AgoraRTC.createMicrophoneAudioTrack();
+                await agoraClient.publish([localTracks.audioTrack]);
+            }
+            
+            // Notify group members
+            if (currentGroup && currentGroup.members) {
+                Object.keys(currentGroup.members).forEach(memberUid => {
+                    if (memberUid !== currentUser.uid) {
+                        database.ref(`incomingCalls/${memberUid}`).set({
+                            callId: channelName,
+                            callerId: currentUser.uid,
+                            callerName: userProfile.name,
+                            callerEmoji: userProfile.emoji,
+                            type: isVideo ? 'video' : 'audio',
+                            isGroupCall: true,
+                            groupId: currentGroup.id,
+                            groupName: currentGroup.name
+                        });
+                    }
+                });
+            }
+            
+            // Hide loading
+            document.getElementById('agora-loading').style.display = 'none';
+            
+            // Set up call controls
+            setupAgoraCallControls();
+            
+        } catch (error) {
+            console.error('Agora group call error:', error);
+            document.getElementById('agora-loading').style.display = 'none';
+            alert('Failed to start group call. Please try again.');
+            endAgoraCall();
+        }
+    }
+
+    function addSelfToParticipantsGrid(isVideo) {
+        const grid = document.getElementById('agora-participants-grid');
+        const participantId = `local_${Date.now()}`;
+        
+        const tile = document.createElement('div');
+        tile.className = 'agora-participant-tile';
+        tile.id = `participant_${participantId}`;
+        
+        if (isVideo) {
+            const video = document.createElement('video');
+            video.className = 'agora-participant-video';
+            video.id = `video_${participantId}`;
+            video.autoplay = true;
+            video.playsinline = true;
+            video.srcObject = localTracks.videoTrack.getMediaStreamTrack();
+            video.play();
+            tile.appendChild(video);
+        }
+        
+        const info = document.createElement('div');
+        info.className = 'agora-participant-info';
+        info.innerHTML = `
+            <span class="agora-participant-name">${userProfile.name} (You)</span>
+            <span id="mute_${participantId}">🎤</span>
+        `;
+        tile.appendChild(info);
+        
+        grid.appendChild(tile);
+        remoteUsers[participantId] = { isLocal: true, videoTrack: localTracks.videoTrack };
+    }
+
+    async function handleUserPublished(user, mediaType) {
+        // Subscribe to the remote user
+        await agoraClient.subscribe(user, mediaType);
+        
+        if (mediaType === "video") {
+            // Show remote video
+            const remoteVideo = document.getElementById('agora-remote-video');
+            remoteVideo.srcObject = user.videoTrack.getMediaStreamTrack();
+            remoteVideo.play();
+        }
+        
+        if (mediaType === "audio") {
+            user.audioTrack.play();
+        }
+    }
+
+    async function handleGroupUserPublished(user, mediaType) {
+        // Subscribe to the remote user
+        await agoraClient.subscribe(user, mediaType);
+        
+        const participantId = user.uid.toString();
+        const grid = document.getElementById('agora-participants-grid');
+        
+        // Check if participant already exists
+        if (!document.getElementById(`participant_${participantId}`)) {
+            const tile = document.createElement('div');
+            tile.className = 'agora-participant-tile';
+            tile.id = `participant_${participantId}`;
+            
+            if (mediaType === "video") {
+                const video = document.createElement('video');
+                video.className = 'agora-participant-video';
+                video.id = `video_${participantId}`;
+                video.autoplay = true;
+                video.playsinline = true;
+                video.srcObject = user.videoTrack.getMediaStreamTrack();
+                video.play();
+                tile.appendChild(video);
+            }
+            
+            const info = document.createElement('div');
+            info.className = 'agora-participant-info';
+            info.innerHTML = `
+                <span class="agora-participant-name">User ${participantId}</span>
+                <span id="mute_${participantId}">🎤</span>
+            `;
+            tile.appendChild(info);
+            
+            grid.appendChild(tile);
+            remoteUsers[participantId] = { uid: user.uid, videoTrack: user.videoTrack, audioTrack: user.audioTrack };
+            
+            // Try to get user info from Firebase
+            database.ref(`users/${participantId}`).once('value').then(snapshot => {
+                if (snapshot.exists()) {
+                    const userData = snapshot.val();
+                    document.querySelector(`#participant_${participantId} .agora-participant-name`).textContent = userData.name;
+                }
+            });
+        }
+    }
+
+    function handleUserUnpublished(user, mediaType) {
+        if (mediaType === "video") {
+            // Hide remote video
+            const remoteVideo = document.getElementById('agora-remote-video');
+            remoteVideo.srcObject = null;
+        }
+    }
+
+    function handleGroupUserUnpublished(user, mediaType) {
+        const participantId = user.uid.toString();
+        const tile = document.getElementById(`participant_${participantId}`);
+        
+        if (tile) {
+            if (mediaType === "video") {
+                const video = document.getElementById(`video_${participantId}`);
+                if (video) {
+                    video.srcObject = null;
+                }
+            }
+        }
+    }
+
+    function handleUserLeft(user) {
+        // Clear remote video
+        const remoteVideo = document.getElementById('agora-remote-video');
+        remoteVideo.srcObject = null;
+        
+        // Show call ended message
+        document.getElementById('agora-loading-text').textContent = 'Call ended';
+        document.getElementById('agora-loading').style.display = 'flex';
+        
+        setTimeout(() => {
+            endAgoraCall();
+        }, 2000);
+    }
+
+    function handleGroupUserLeft(user) {
+        const participantId = user.uid.toString();
+        const tile = document.getElementById(`participant_${participantId}`);
+        
+        if (tile) {
+            tile.remove();
+            delete remoteUsers[participantId];
+        }
+    }
+
+    function setupAgoraCallControls() {
+        // Microphone toggle
+        document.getElementById('agora-mic-toggle').onclick = () => {
+            if (localTracks.audioTrack) {
+                isAudioMuted = !isAudioMuted;
+                localTracks.audioTrack.setMuted(isAudioMuted);
+                const btn = document.getElementById('agora-mic-toggle');
+                if (isAudioMuted) {
+                    btn.classList.add('muted');
+                    btn.innerHTML = '<i class="fas fa-microphone-slash"></i>';
+                } else {
+                    btn.classList.remove('muted');
+                    btn.innerHTML = '<i class="fas fa-microphone"></i>';
+                }
+            }
+        };
+        
+        // Camera toggle
+        document.getElementById('agora-camera-toggle').onclick = () => {
+            if (localTracks.videoTrack) {
+                isVideoMuted = !isVideoMuted;
+                localTracks.videoTrack.setMuted(isVideoMuted);
+                const btn = document.getElementById('agora-camera-toggle');
+                if (isVideoMuted) {
+                    btn.classList.add('muted');
+                    btn.innerHTML = '<i class="fas fa-video-slash"></i>';
+                    document.getElementById('agora-local-video').style.display = 'none';
+                } else {
+                    btn.classList.remove('muted');
+                    btn.innerHTML = '<i class="fas fa-video"></i>';
+                    document.getElementById('agora-local-video').style.display = 'block';
+                }
+            }
+        };
+        
+        // Switch camera
+        document.getElementById('agora-switch-camera').onclick = async () => {
+            if (localTracks.videoTrack) {
+                try {
+                    // Get available cameras
+                    const devices = await AgoraRTC.getCameras();
+                    if (devices.length > 1) {
+                        // Switch to next camera
+                        const currentDevice = localTracks.videoTrack.getTrackLabel();
+                        const currentIndex = devices.findIndex(d => d.label === currentDevice);
+                        const nextIndex = (currentIndex + 1) % devices.length;
+                        
+                        // Create new track with different camera
+                        const newVideoTrack = await AgoraRTC.createCameraVideoTrack({
+                            cameraId: devices[nextIndex].deviceId
+                        });
+                        
+                        // Replace old track
+                        await agoraClient.unpublish([localTracks.videoTrack]);
+                        localTracks.videoTrack.close();
+                        localTracks.videoTrack = newVideoTrack;
+                        await agoraClient.publish([localTracks.videoTrack]);
+                        
+                        // Update local video
+                        document.getElementById('agora-local-video').srcObject = newVideoTrack.getMediaStreamTrack();
+                        document.getElementById('agora-local-video').play();
+                    }
+                } catch (error) {
+                    console.error('Error switching camera:', error);
+                }
+            }
+        };
+        
+        // Switch speaker (for mobile/desktop)
+        document.getElementById('agora-switch-speaker').onclick = async () => {
+            // Note: Speaker switching requires additional setup on web
+            // This is a placeholder for future implementation
+            alert('Speaker switching is not fully supported on web. Please adjust your system audio settings.');
+        };
+    }
+
+    async function acceptIncomingAgoraCall(callData) {
+        try {
+            // Show loading
+            document.getElementById('agora-loading').style.display = 'flex';
+            document.getElementById('agora-call-screen').style.display = 'flex';
+            
+            currentChannel = callData.callId;
+            isGroupCall = callData.isGroupCall || false;
+            
+            // Initialize Agora client
+            agoraClient = AgoraRTC.createClient(agoraConfig);
+            
+            // Set up event listeners
+            if (isGroupCall) {
+                document.getElementById('agora-remote-video').style.display = 'none';
+                document.getElementById('agora-participants-grid').style.display = 'grid';
+                agoraClient.on("user-published", handleGroupUserPublished);
+                agoraClient.on("user-unpublished", handleGroupUserUnpublished);
+                agoraClient.on("user-left", handleGroupUserLeft);
+            } else {
+                agoraClient.on("user-published", handleUserPublished);
+                agoraClient.on("user-unpublished", handleUserUnpublished);
+                agoraClient.on("user-left", handleUserLeft);
+            }
+            
+            // Join the channel
+            const uid = await agoraClient.join(AGORA_APP_ID, callData.callId, AGORA_TEMP_TOKEN, null);
+            
+            // Create local tracks based on call type
+            const isVideo = callData.type === 'video';
+            
+            if (isVideo) {
+                localTracks.videoTrack = await AgoraRTC.createCameraVideoTrack();
+                localTracks.audioTrack = await AgoraRTC.createMicrophoneAudioTrack();
+                
+                // Play local video
+                document.getElementById('agora-local-video').srcObject = localTracks.videoTrack.getMediaStreamTrack();
+                document.getElementById('agora-local-video').play();
+                
+                // Publish both tracks
+                await agoraClient.publish([localTracks.audioTrack, localTracks.videoTrack]);
+                
+                if (isGroupCall) {
+                    addSelfToParticipantsGrid(true);
+                }
+            } else {
+                // Audio only
+                localTracks.audioTrack = await AgoraRTC.createMicrophoneAudioTrack();
+                await agoraClient.publish([localTracks.audioTrack]);
+                
+                // Hide local video for audio call
+                document.getElementById('agora-local-video').style.display = 'none';
+                
+                if (isGroupCall) {
+                    addSelfToParticipantsGrid(false);
+                }
+            }
+            
+            // Hide loading
+            document.getElementById('agora-loading').style.display = 'none';
+            
+            // Set up call controls
+            setupAgoraCallControls();
+            
+        } catch (error) {
+            console.error('Error accepting Agora call:', error);
+            document.getElementById('agora-loading').style.display = 'none';
+            alert('Failed to join call. Please try again.');
+            endAgoraCall();
+        }
+    }
+
+    function endAgoraCall() {
+        // Stop and clear local tracks
+        if (localTracks.audioTrack) {
+            localTracks.audioTrack.stop();
+            localTracks.audioTrack.close();
+            localTracks.audioTrack = null;
+        }
+        
+        if (localTracks.videoTrack) {
+            localTracks.videoTrack.stop();
+            localTracks.videoTrack.close();
+            localTracks.videoTrack = null;
+        }
+        
+        // Leave the channel
+        if (agoraClient) {
+            agoraClient.leave();
+            agoraClient = null;
+        }
+        
+        // Clear remote users
+        remoteUsers = {};
+        
+        // Clear video elements
+        document.getElementById('agora-remote-video').srcObject = null;
+        document.getElementById('agora-local-video').srcObject = null;
+        
+        // Clear participants grid
+        const grid = document.getElementById('agora-participants-grid');
+        grid.innerHTML = '';
+        
+        // Reset UI
+        document.getElementById('agora-call-screen').style.display = 'none';
+        document.getElementById('agora-remote-video').style.display = 'block';
+        document.getElementById('agora-local-video').style.display = 'block';
+        document.getElementById('agora-participants-grid').style.display = 'none';
+        
+        // Clear Firebase call notification
+        if (currentUser) {
+            database.ref(`incomingCalls/${currentUser.uid}`).remove();
+        }
+        
+        // Reset call state
+        currentChannel = null;
+        isGroupCall = false;
+        isAudioMuted = false;
+        isVideoMuted = false;
+    }
+
+    // Listen for incoming Agora calls
     function listenForIncomingCalls() {
         if (!currentUser) return;
 
@@ -2643,7 +3119,9 @@
                 document.getElementById('incoming-call-emoji').textContent = callData.callerEmoji;
                 document.getElementById('incoming-call-name').textContent = callData.callerName;
                 document.getElementById('incoming-call-type').textContent = 
-                    callData.type === 'video' ? 'Incoming Video Call' : 'Incoming Voice Call';
+                    callData.isGroupCall ? 
+                    `Group ${callData.type === 'video' ? 'Video' : 'Voice'} Call` :
+                    `Incoming ${callData.type === 'video' ? 'Video' : 'Voice'} Call`;
                 
                 showModal('incoming-call-modal');
                 playSound('call-sound');
@@ -2657,7 +3135,7 @@
                 newAcceptBtn.addEventListener('click', () => {
                     stopSound('call-sound');
                     hideModal('incoming-call-modal');
-                    acceptIncomingCall(callData);
+                    acceptIncomingAgoraCall(callData);
                     // Clear the incoming call notification
                     database.ref(`incomingCalls/${currentUser.uid}`).remove();
                 });
@@ -3195,11 +3673,11 @@
         
         // Set up call buttons in header
         document.getElementById('chat-voice-call-btn').onclick = () => {
-            startSimpleAudioCall();
+            startAgoraAudioCall();
         };
         
         document.getElementById('chat-video-call-btn').onclick = () => {
-            startSimpleVideoCall();
+            startAgoraVideoCall();
         };
         
         // Set up chat menu buttons
@@ -3431,12 +3909,12 @@
         
         document.getElementById('friend-profile-audio-call-btn').onclick = () => {
             hideModal('friend-profile-modal');
-            startSimpleAudioCall();
+            startAgoraAudioCall();
         };
         
         document.getElementById('friend-profile-video-call-btn').onclick = () => {
             hideModal('friend-profile-modal');
-            startSimpleVideoCall();
+            startAgoraVideoCall();
         };
         
         document.getElementById('friend-profile-block-btn').onclick = () => {
@@ -3539,11 +4017,11 @@
         
         // Set up call buttons
         document.getElementById('group-chat-voice-call-btn').onclick = () => {
-            startSimpleGroupAudioCall();
+            startAgoraGroupAudioCall();
         };
         
         document.getElementById('group-chat-video-call-btn').onclick = () => {
-            startSimpleGroupVideoCall();
+            startAgoraGroupVideoCall();
         };
         
         // Set up group chat menu buttons
@@ -4483,7 +4961,7 @@
         listenForUnreadCounts();
         loadUserGroups();
         listenForGroupUnreadCounts();
-        listenForIncomingCalls(); // Added call listener
+        listenForIncomingCalls(); // Added Agora call listener
         
         // Request notification permission
         if ('Notification' in window && Notification.permission === 'default') {
@@ -4512,16 +4990,6 @@
         localStorage.setItem('theme', 'light');
     }
 
-    function toggleMute() {
-        isMuted = !isMuted;
-        console.log(isMuted ? 'Muted' : 'Unmuted');
-    }
-
-    function toggleSpeaker() {
-        isSpeakerOn = !isSpeakerOn;
-        console.log(isSpeakerOn ? 'Speaker on' : 'Speaker off');
-    }
-
     // ====================
     // INITIAL SETUP
     // ====================
@@ -4539,26 +5007,26 @@
         showPanel('home-content');
         
         // Initialize draggable local video
-        const simpleLocalVideo = document.getElementById('simple-local-video');
-        if (simpleLocalVideo) {
+        const agoraLocalVideo = document.getElementById('agora-local-video');
+        if (agoraLocalVideo) {
             let isDragging = false;
             let offsetX, offsetY;
             
-            simpleLocalVideo.addEventListener('mousedown', startDrag);
-            simpleLocalVideo.addEventListener('touchstart', startDrag);
+            agoraLocalVideo.addEventListener('mousedown', startDrag);
+            agoraLocalVideo.addEventListener('touchstart', startDrag);
             
             function startDrag(e) {
                 isDragging = true;
                 
                 if (e.type === 'mousedown') {
-                    offsetX = e.clientX - simpleLocalVideo.offsetLeft;
-                    offsetY = e.clientY - simpleLocalVideo.offsetTop;
+                    offsetX = e.clientX - agoraLocalVideo.offsetLeft;
+                    offsetY = e.clientY - agoraLocalVideo.offsetTop;
                     document.addEventListener('mousemove', drag);
                     document.addEventListener('mouseup', stopDrag);
                 } else {
                     const touch = e.touches[0];
-                    offsetX = touch.clientX - simpleLocalVideo.offsetLeft;
-                    offsetY = touch.clientY - simpleLocalVideo.offsetTop;
+                    offsetX = touch.clientX - agoraLocalVideo.offsetLeft;
+                    offsetY = touch.clientY - agoraLocalVideo.offsetTop;
                     document.addEventListener('touchmove', drag);
                     document.addEventListener('touchend', stopDrag);
                 }
@@ -4579,8 +5047,8 @@
                     clientY = touch.clientY;
                 }
                 
-                simpleLocalVideo.style.left = (clientX - offsetX) + 'px';
-                simpleLocalVideo.style.top = (clientY - offsetY) + 'px';
+                agoraLocalVideo.style.left = (clientX - offsetX) + 'px';
+                agoraLocalVideo.style.top = (clientY - offsetY) + 'px';
             }
             
             function stopDrag() {
