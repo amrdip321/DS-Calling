@@ -2554,7 +2554,41 @@
     // REPLACE THESE WITH YOUR AGORA CREDENTIALS
     const AGORA_APP_ID = "eece2833b1fd493fa9fa490041be5140"; // Replace with your Agora App ID
     const AGORA_TEMP_TOKEN = "007eJxTYLAvlF4qe5NR2eyw/JLstRMm8cYnHO7nOrf95Pddy0q+7j6swJCampxqZGFsnGSYlmJiaZyWaJmWaGJpYGBimJRqamhiILiuIbMhkJEhr/ANMyMDBIL4XAwuwQrOiTk5mXnpDAwAJpYh9w=="; // Replace with your temporary token
-    
+
+    const AGORA_APP_ID = "eece2833b1fd493fa9fa490041be5140";
+        
+   // const AGORA_TEMP_TOKEN = "007eJxTYLAvlF4qe5NR2eyw/JLstRM...";
+
+   const TOKEN_SERVER_URL = "https://ds-calling-server.vercel.app/api/generate-token";
+
+        // ====================
+// TOKEN FUNCTIONS
+// ====================
+async function fetchToken(channelName) {
+    try {
+        const response = await fetch(TOKEN_SERVER_URL, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                channelName: channelName,
+                uid: 0
+            })
+        });
+        
+        if (!response.ok) {
+            throw new Error('Token server error');
+        }
+        
+        const data = await response.json();
+        return data.token;
+    } catch (error) {
+        console.error('Failed to fetch token:', error);
+        throw new Error('Cannot connect to token server');
+    }
+        }
+        
     // Agora variables
     let agoraClient = null;
     let localTracks = {
@@ -2651,8 +2685,11 @@
             agoraClient.on("user-unpublished", handleUserUnpublished);
             agoraClient.on("user-left", handleUserLeft);
             
-            // Join the channel
-            const uid = await agoraClient.join(AGORA_APP_ID, channelName, AGORA_TEMP_TOKEN, null);
+// Get token from your server
+const token = await fetchToken(channelName);
+    
+// Join the channel
+const uid = await agoraClient.join(AGORA_APP_ID, channelName, token, null);
             
             // Create local tracks
             if (isVideo) {
@@ -2721,8 +2758,11 @@
             agoraClient.on("user-unpublished", handleGroupUserUnpublished);
             agoraClient.on("user-left", handleGroupUserLeft);
             
-            // Join the channel
-            const uid = await agoraClient.join(AGORA_APP_ID, channelName, AGORA_TEMP_TOKEN, null);
+            // Get token from your server
+const token = await fetchToken(channelName);
+    
+// Join the channel
+const uid = await agoraClient.join(AGORA_APP_ID, channelName, token, null);
             
             // Create local tracks
             if (isVideo) {
@@ -3011,8 +3051,11 @@
                 agoraClient.on("user-left", handleUserLeft);
             }
             
-            // Join the channel
-            const uid = await agoraClient.join(AGORA_APP_ID, callData.callId, AGORA_TEMP_TOKEN, null);
+            // Get token from your server
+const token = await fetchToken(callData.callId);
+    
+// Join the channel
+const uid = await agoraClient.join(AGORA_APP_ID, callData.callId, token, null);
             
             // Create local tracks based on call type
             const isVideo = callData.type === 'video';
